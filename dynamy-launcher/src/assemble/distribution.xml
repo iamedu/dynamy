@@ -35,7 +35,7 @@
 			<outputDirectory></outputDirectory>
 			<includes>
 				<include>config/**</include>
-				<include>autodeploy/**</include>
+				<include>bundle/**</include>
 			</includes>
 		</fileSet>
 	</fileSets>

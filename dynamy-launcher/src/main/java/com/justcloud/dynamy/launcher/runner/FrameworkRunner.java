@@ -1,11 +1,15 @@
 package com.justcloud.dynamy.launcher.runner;
 
+import java.io.IOException;
+
 import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 
-public abstract class FrameworkRunner {
+import com.justcloud.dynamy.deployer.AutoDeployService;
 
+public abstract class FrameworkRunner {
+		
 	public abstract void start(FrameworkConfig config);
 
 	protected Framework realStart(FrameworkConfig config) throws BundleException {
@@ -14,6 +18,14 @@ public abstract class FrameworkRunner {
 		
 		framework.init();
 		framework.start();
+		
+		String autoDeployPath = config.getProperties().get("dynamy.autodeploy.dir");
+		
+		try {
+			new AutoDeployService(framework, autoDeployPath);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		
 		return framework;
 	}
