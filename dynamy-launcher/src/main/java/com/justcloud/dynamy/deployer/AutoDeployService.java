@@ -17,6 +17,8 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -98,6 +100,8 @@ public class AutoDeployService {
 	}
 
 	private void installCurrent() throws IOException {
+		final List<Bundle> startBundles = new ArrayList<>();
+
 		Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult visitFile(Path file,
@@ -107,7 +111,14 @@ public class AutoDeployService {
 				}
 				
 				try {
-					processInstall(file);
+					BundleContext context = framework.getBundleContext();
+					Bundle bundle = context.installBundle("file://" + file.toAbsolutePath().toString());
+					bundles.put(file.toAbsolutePath().toString(), bundle);
+					logger.info("Installed the bundle " + bundle);
+					BundleRevision revision = (BundleRevision)bundle.adapt(BundleRevision.class);
+					if ((revision.getTypes() & BundleRevision.TYPE_FRAGMENT) == 0) {
+						startBundles.add(bundle);
+					}
 				} catch (BundleException e) {
 					logger.warning(e.getMessage());
 				}
@@ -115,6 +126,17 @@ public class AutoDeployService {
 				return FileVisitResult.CONTINUE;
 			}
 		});
+
+		logger.info("Starting bundles");
+		for(Bundle bundle : startBundles) {
+			try {
+				bundle.start();
+				logger.info("Started bundle " + bundle);
+			} catch(BundleException e) {
+				logger.warning(e.getMessage());
+			}
+		}
+
 	}
 
 	private void processInstall(Path child) throws BundleException {

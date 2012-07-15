@@ -16,7 +16,27 @@
 	<dependencySets>
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
+			<scope>compile</scope>
+			<includes>
+                                <include>org.apache.felix:org.apache.felix.framework</include>
+                                <include>org.osgi:org.osgi.core</include>
+                                <include>commons-cli:commons-cli</include>
+			</includes>
+			<useProjectArtifact>false</useProjectArtifact>
+		</dependencySet>
+		<dependencySet>
+			<outputDirectory>/bundle</outputDirectory>
 			<scope>runtime</scope>
+			<excludes>
+                                <exclude>org.apache.felix:org.apache.felix.framework</exclude>
+                                <exclude>org.osgi:org.osgi.core</exclude>
+                                <exclude>org.osgi:org.osgi.compendium</exclude>
+                                <exclude>commons-cli:commons-cli</exclude>
+                                <exclude>org.scala-lang:scala-library</exclude>
+                                <exclude>org.easymock:easymock</exclude>
+			</excludes>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
 		</dependencySet>
 	</dependencySets>
 
